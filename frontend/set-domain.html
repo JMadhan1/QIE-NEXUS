@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set QIE Domain | QIE Nexus</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+    <nav class="navbar"
+        style="background: var(--bg-secondary); padding: var(--spacing-md) 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: var(--text-xl); font-weight: 700;">🔮 QIE Nexus</div>
+            <div style="display: flex; gap: var(--spacing-lg); align-items: center;">
+                <a href="index.html">Home</a>
+                <a href="dashboard.html">Markets</a>
+                <a href="portfolio.html">Portfolio</a>
+                <a href="governance.html">Governance</a>
+                <button class="btn btn-primary btn-sm" id="wallet-btn" onclick="connectWallet()">Connect Wallet</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container" style="padding: var(--spacing-2xl) 0;">
+        <div style="max-width: 600px; margin: 0 auto;">
+            <h1>Set Your QIE Domain</h1>
+            <p style="color: var(--text-secondary); margin-bottom: var(--spacing-xl);">
+                If you have a QIE Wallet domain (like nexus.qie), you can set it here to display instead of your wallet
+                address.
+            </p>
+
+            <div class="card">
+                <h3>QIE Domain Settings</h3>
+
+                <div style="margin-top: var(--spacing-lg);">
+                    <label style="display: block; margin-bottom: var(--spacing-sm); font-weight: 600;">
+                        Your QIE Domain Name
+                    </label>
+                    <input type="text" id="domain-input" class="input" placeholder="nexus.qie"
+                        style="margin-bottom: var(--spacing-md);">
+
+                    <p
+                        style="font-size: var(--text-sm); color: var(--text-secondary); margin-bottom: var(--spacing-lg);">
+                        💡 Enter your QIE domain name (e.g., nexus.qie, alice.qie)
+                    </p>
+
+                    <button class="btn btn-primary" onclick="saveDomain()" style="width: 100%;">
+                        Save Domain
+                    </button>
+                </div>
+
+                <div id="current-domain"
+                    style="margin-top: var(--spacing-xl); padding-top: var(--spacing-lg); border-top: 1px solid rgba(255,255,255,0.1);">
+                    <h4 style="margin-bottom: var(--spacing-sm);">Current Settings</h4>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: var(--spacing-sm);">
+                        <span style="color: var(--text-secondary);">Domain:</span>
+                        <span id="current-domain-value" style="color: var(--qie-primary); font-weight: 600;">Not
+                            set</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-secondary);">Wallet:</span>
+                        <span id="current-wallet-value">Not connected</span>
+                    </div>
+                </div>
+
+                <button class="btn btn-secondary" onclick="clearDomain()"
+                    style="width: 100%; margin-top: var(--spacing-md);">
+                    Clear Domain
+                </button>
+            </div>
+
+            <div class="card"
+                style="margin-top: var(--spacing-xl); background: rgba(233, 30, 140, 0.1); border: 1px solid rgba(233, 30, 140, 0.3);">
+                <h4 style="margin-bottom: var(--spacing-sm);">ℹ️ About QIE Domains</h4>
+                <p style="font-size: var(--text-sm); color: var(--text-secondary); line-height: 1.6;">
+                    QIE domains are human-readable Web3 identities on the QIE Blockchain. Instead of showing your long
+                    wallet address (0x1234...5678), your domain name (like nexus.qie) will be displayed throughout the
+                    application.
+                </p>
+                <p
+                    style="font-size: var(--text-sm); color: var(--text-secondary); line-height: 1.6; margin-top: var(--spacing-sm);">
+                    <strong>Don't have a QIE domain?</strong> Visit <a href="https://www.qiewallet.me/" target="_blank"
+                        style="color: var(--qie-primary);">QIE Wallet</a> to get yours!
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="js/web3.js"></script>
+    <script>
+        // Load current settings on page load
+        window.addEventListener('load', () => {
+            updateCurrentSettings();
+        });
+
+        function updateCurrentSettings() {
+            const domain = localStorage.getItem('qieDomain');
+            const wallet = localStorage.getItem('walletAddress');
+
+            document.getElementById('current-domain-value').textContent = domain || 'Not set';
+            document.getElementById('current-wallet-value').textContent = wallet ? formatAddress(wallet) : 'Not connected';
+
+            if (domain) {
+                document.getElementById('domain-input').value = domain;
+            }
+        }
+
+        function saveDomain() {
+            const domainInput = document.getElementById('domain-input');
+            const domain = domainInput.value.trim();
+
+            if (!domain) {
+                showNotification('Please enter a domain name', 'warning');
+                return;
+            }
+
+            // Validate domain format (should end with .qie)
+            if (!domain.endsWith('.qie')) {
+                showNotification('Domain must end with .qie', 'warning');
+                return;
+            }
+
+            // Save to localStorage
+            localStorage.setItem('qieDomain', domain);
+
+            // Update UI
+            updateCurrentSettings();
+
+            // Update wallet UI if connected
+            const walletAddress = localStorage.getItem('walletAddress');
+            const walletConnected = localStorage.getItem('walletConnected');
+
+            if (walletConnected === 'true' && walletAddress) {
+                // Get current balance
+                const isDemoMode = localStorage.getItem('demoMode') === 'true';
+                const balance = isDemoMode
+                    ? localStorage.getItem('demoBalance') || '10000'
+                    : '...';
+
+                updateWalletUI(walletAddress, balance, domain);
+            }
+
+            showNotification(`Domain saved: ${domain} ✅`, 'success');
+        }
+
+        function clearDomain() {
+            localStorage.removeItem('qieDomain');
+            document.getElementById('domain-input').value = '';
+            updateCurrentSettings();
+
+            // Update wallet UI if connected
+            const walletAddress = localStorage.getItem('walletAddress');
+            const walletConnected = localStorage.getItem('walletConnected');
+
+            if (walletConnected === 'true' && walletAddress) {
+                const isDemoMode = localStorage.getItem('demoMode') === 'true';
+                const balance = isDemoMode
+                    ? localStorage.getItem('demoBalance') || '10000'
+                    : '...';
+
+                updateWalletUI(walletAddress, balance, null);
+            }
+
+            showNotification('Domain cleared', 'info');
+        }
+    </script>
+</body>
+
+</html>

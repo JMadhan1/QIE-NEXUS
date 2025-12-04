@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | QIE Nexus</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/main.css">
+
+    <style>
+        /* Navigation */
+        .navbar {
+            background: var(--bg-secondary);
+            padding: var(--spacing-md) 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            font-size: var(--text-xl);
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: var(--spacing-lg);
+            align-items: center;
+        }
+
+        .navbar-menu a {
+            color: var(--text-secondary);
+            transition: color 0.3s;
+        }
+
+        .navbar-menu a:hover {
+            color: var(--text-primary);
+        }
+
+        /* Filters */
+        .filters {
+            background: var(--bg-secondary);
+            padding: var(--spacing-xl);
+            border-radius: var(--radius-xl);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-tab.active {
+            background: var(--qie-primary);
+            border-color: var(--qie-primary);
+            color: white;
+        }
+
+        .filter-tab:hover {
+            border-color: var(--qie-primary);
+        }
+
+        /* Market Card */
+        .market-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-xl);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .market-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--qie-primary);
+        }
+
+        .market-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .market-question {
+            font-size: var(--text-lg);
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .confidence-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: var(--text-sm);
+            font-weight: 600;
+        }
+
+        .confidence-high {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .confidence-medium {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .confidence-low {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .stakes-bar {
+            height: 8px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: var(--spacing-md) 0;
+        }
+
+        .stakes-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), var(--danger));
+            transition: width 0.3s;
+        }
+
+        .stakes-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+
+        .market-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: var(--spacing-md);
+            padding-top: var(--spacing-md);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .countdown {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: var(--spacing-2xl);
+        }
+
+        @media (max-width: 768px) {
+            .navbar-menu {
+                gap: var(--spacing-sm);
+            }
+
+            .filter-tabs {
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-brand">🔮 QIE Nexus</div>
+            <div class="navbar-menu">
+                <a href="index.html">Home</a>
+                <a href="dashboard.html" style="color: var(--qie-primary);">Markets</a>
+                <a href="portfolio.html">Portfolio</a>
+                <a href="governance.html">Governance</a>
+                <button class="btn btn-primary btn-sm" id="wallet-btn" onclick="connectWallet()">Connect Wallet</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container" style="padding: var(--spacing-2xl) 0;">
+        <!-- Header -->
+        <div style="margin-bottom: var(--spacing-xl);">
+            <h1>Prediction Markets</h1>
+            <p style="font-size: var(--text-lg);">Stake on AI-powered predictions and earn rewards</p>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters">
+            <div class="filter-tabs">
+                <button class="filter-tab active" data-category="all">All Markets</button>
+                <button class="filter-tab" data-category="crypto">Crypto</button>
+                <button class="filter-tab" data-category="forex">Forex</button>
+                <button class="filter-tab" data-category="commodities">Commodities</button>
+            </div>
+
+            <div style="display: flex; gap: var(--spacing-md); flex-wrap: wrap;">
+                <select class="input" style="width: auto;" id="sort-select">
+                    <option value="volume">Sort by Volume</option>
+                    <option value="time">Sort by Time</option>
+                    <option value="confidence">Sort by AI Confidence</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Markets Grid -->
+        <div id="markets-container" class="grid grid-3">
+            <!-- Loading state -->
+            <div class="loading" style="grid-column: 1 / -1;">
+                <div class="spinner" style="margin: 0 auto var(--spacing-md);"></div>
+                <p>Loading markets...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="js/web3.js"></script>
+
+    <script>
+        // API Configuration
+        const API_BASE_URL = 'http://localhost:5000/api';
+
+        // State
+        let markets = [];
+        let currentCategory = 'all';
+        let currentSort = 'volume';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            setupFilters();
+            await loadMarkets();
+        });
+
+        // Setup filter listeners
+        function setupFilters() {
+            // Category filters
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentCategory = tab.dataset.category;
+                    renderMarkets();
+                });
+            });
+
+            // Sort select
+            document.getElementById('sort-select').addEventListener('change', (e) => {
+                currentSort = e.target.value;
+                renderMarkets();
+            });
+        }
+
+        // Load markets from API
+        async function loadMarkets() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/markets`);
+                const data = await response.json();
+                markets = data.markets || [];
+                renderMarkets();
+            } catch (error) {
+                console.error('Error loading markets:', error);
+                document.getElementById('markets-container').innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: var(--spacing-2xl);">
+                        <p style="color: var(--danger);">Failed to load markets. Please try again.</p>
+                        <button class="btn btn-primary mt-2" onclick="loadMarkets()">Retry</button>
+                    </div>
+                `;
+            }
+        }
+
+        // Render markets
+        function renderMarkets() {
+            const container = document.getElementById('markets-container');
+
+            if (markets.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: var(--spacing-2xl);">
+                        <p>No markets available</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Filter and sort
+            let filtered = markets;
+            if (currentCategory !== 'all') {
+                // Filter by category (you can enhance this based on market data)
+                filtered = markets;
+            }
+
+            // Sort
+            if (currentSort === 'volume') {
+                filtered.sort((a, b) => (b.totalStakeYes + b.totalStakeNo) - (a.totalStakeYes + a.totalStakeNo));
+            } else if (currentSort === 'time') {
+                filtered.sort((a, b) => a.deadline - b.deadline);
+            } else if (currentSort === 'confidence') {
+                filtered.sort((a, b) => b.aiConfidence - a.aiConfidence);
+            }
+
+            // Render
+            container.innerHTML = filtered.map(market => createMarketCard(market)).join('');
+        }
+
+        // Create market card HTML
+        function createMarketCard(market) {
+            const totalStake = market.totalStakeYes + market.totalStakeNo;
+            const yesPercent = totalStake > 0 ? (market.totalStakeYes / totalStake * 100) : 50;
+            const confidence = market.aiConfidence || 50;
+            const confidenceClass = confidence >= 70 ? 'confidence-high' : confidence >= 50 ? 'confidence-medium' : 'confidence-low';
+
+            // Calculate time remaining
+            const now = Math.floor(Date.now() / 1000);
+            const timeLeft = market.deadline - now;
+            const daysLeft = Math.floor(timeLeft / 86400);
+            const hoursLeft = Math.floor((timeLeft % 86400) / 3600);
+
+            return `
+                <div class="market-card" onclick="window.location.href='market.html?id=${market.id}'">
+                    <div class="market-header">
+                        <div style="flex: 1;">
+                            <div class="market-question">${market.question}</div>
+                            <span class="badge badge-info">Market #${market.id}</span>
+                        </div>
+                        <div class="confidence-badge ${confidenceClass}">
+                            🤖 ${confidence}%
+                        </div>
+                    </div>
+                    
+                    <div class="stakes-bar">
+                        <div class="stakes-fill" style="width: ${yesPercent}%"></div>
+                    </div>
+                    
+                    <div class="stakes-info">
+                        <span style="color: var(--success);">YES: ${market.totalStakeYes.toFixed(2)} QIE</span>
+                        <span style="color: var(--danger);">NO: ${market.totalStakeNo.toFixed(2)} QIE</span>
+                    </div>
+                    
+                    <div class="market-footer">
+                        <div class="countdown">
+                            ⏱️ ${daysLeft}d ${hoursLeft}h remaining
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); window.location.href='market.html?id=${market.id}'">
+                            Stake Now
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+
+</html>

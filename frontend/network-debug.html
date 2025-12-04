@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Debug</title>
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        body {
+            padding: 50px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .info-box {
+            padding: 20px;
+            margin: 20px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .chain-id {
+            font-size: 24px;
+            font-weight: bold;
+            color: #E91E8C;
+        }
+
+        pre {
+            background: #000;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🔍 Network Debug Tool</h1>
+
+    <button class="btn btn-primary" onclick="checkNetwork()">Check Current Network</button>
+
+    <div id="results"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script>
+        async function checkNetwork() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<p>Checking...</p>';
+
+            if (typeof window.ethereum === 'undefined') {
+                resultsDiv.innerHTML = '<div class="info-box" style="border: 2px solid #EF4444;">❌ No wallet detected</div>';
+                return;
+            }
+
+            try {
+                const web3 = new Web3(window.ethereum);
+
+                // Request accounts
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+                // Get chain ID (as number)
+                const chainIdNum = await web3.eth.getChainId();
+
+                // Get chain ID (as hex)
+                const chainIdHex = '0x' + chainIdNum.toString(16).toUpperCase();
+
+                // Get network type
+                const networkType = await web3.eth.net.getNetworkType();
+
+                // Get balance
+                let balance = '0';
+                try {
+                    const balanceWei = await web3.eth.getBalance(accounts[0]);
+                    balance = web3.utils.fromWei(balanceWei, 'ether');
+                } catch (e) {
+                    balance = 'Error: ' + e.message;
+                }
+
+                // Network names
+                const networkNames = {
+                    1: 'Ethereum Mainnet',
+                    5: 'Goerli Testnet',
+                    11155111: 'Sepolia Testnet',
+                    1234: 'QIE Mainnet',
+                    1983: 'QIE Testnet'
+                };
+
+                const networkName = networkNames[chainIdNum] || 'Unknown Network';
+                const isCorrect = chainIdNum === 1983;
+
+                resultsDiv.innerHTML = `
+                    <div class="info-box" style="border: 2px solid ${isCorrect ? '#10B981' : '#F59E0B'};">
+                        <h2>${isCorrect ? '✅' : '⚠️'} Network Status</h2>
+                        <p><strong>Network Name:</strong> ${networkName}</p>
+                        <p><strong>Chain ID (Decimal):</strong> <span class="chain-id">${chainIdNum}</span></p>
+                        <p><strong>Chain ID (Hex):</strong> ${chainIdHex}</p>
+                        <p><strong>Network Type:</strong> ${networkType}</p>
+                        <p><strong>Your Address:</strong> ${accounts[0]}</p>
+                        <p><strong>Balance:</strong> ${balance} QIE</p>
+                        ${!isCorrect ? '<p style="color: #F59E0B; margin-top: 20px;">⚠️ You are NOT on QIE Testnet (1983). Please switch your wallet to QIE Testnet.</p>' : '<p style="color: #10B981; margin-top: 20px;">✅ Perfect! You are on QIE Testnet!</p>'}
+                    </div>
+
+                    <div class="info-box">
+                        <h3>Expected QIE Testnet Details:</h3>
+                        <pre>Chain ID: 1983 (0x7BF)
+Name: QIE Testnet
+RPC: https://rpc1testnet.qie.digital
+Explorer: https://testnet.qie.digital</pre>
+                    </div>
+
+                    <div class="info-box">
+                        <h3>Raw Data:</h3>
+                        <pre>${JSON.stringify({
+                    chainId: chainIdNum,
+                    chainIdHex: chainIdHex,
+                    networkType: networkType,
+                    account: accounts[0],
+                    balance: balance,
+                    isQIEWallet: window.ethereum.isQIEWallet,
+                    isMetaMask: window.ethereum.isMetaMask
+                }, null, 2)}</pre>
+                    </div>
+                `;
+
+                // Auto-refresh every 3 seconds to monitor network changes
+                setTimeout(checkNetwork, 3000);
+
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="info-box" style="border: 2px solid #EF4444;">
+                    <h2>❌ Error</h2>
+                    <p>${error.message}</p>
+                    <pre>${JSON.stringify(error, null, 2)}</pre>
+                </div>`;
+            }
+        }
+
+        // Auto-check on load
+        window.addEventListener('load', () => {
+            setTimeout(checkNetwork, 500);
+        });
+
+        // Listen for network changes
+        if (window.ethereum) {
+            window.ethereum.on('chainChanged', (chainId) => {
+                console.log('Network changed to:', chainId);
+                checkNetwork();
+            });
+        }
+    </script>
+</body>
+
+</html>

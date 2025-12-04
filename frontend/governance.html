@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Governance | QIE Nexus</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+
+    <style>
+        .proposal-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-xl);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: var(--spacing-lg);
+            transition: all 0.3s;
+        }
+
+        .proposal-card:hover {
+            border-color: var(--qie-primary);
+            transform: translateY(-2px);
+        }
+
+        .proposal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .proposal-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: var(--text-xs);
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .status-passed {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--info);
+        }
+
+        .status-rejected {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .vote-bar {
+            height: 8px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: var(--spacing-md) 0;
+        }
+
+        .vote-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), var(--qie-primary));
+            transition: width 0.3s;
+        }
+
+        .vote-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-md);
+        }
+
+        .model-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-lg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .model-version {
+            font-size: var(--text-2xl);
+            font-weight: 700;
+            color: var(--qie-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--spacing-sm) 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .metric:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar"
+        style="background: var(--bg-secondary); padding: var(--spacing-md) 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: var(--text-xl); font-weight: 700;">🔮 QIE Nexus</div>
+            <div style="display: flex; gap: var(--spacing-lg); align-items: center;">
+                <a href="index.html">Home</a>
+                <a href="dashboard.html">Markets</a>
+                <a href="portfolio.html">Portfolio</a>
+                <a href="governance.html" style="color: var(--qie-primary);">Governance</a>
+                <button class="btn btn-primary btn-sm" id="wallet-btn"
+                    onclick="connectWallet()">Connect Wallet</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container" style="padding: var(--spacing-2xl) 0;">
+        <h1>🏛️ DAO Governance</h1>
+        <p style="font-size: var(--text-lg); margin-bottom: var(--spacing-xl);">Vote on proposals and shape the future
+            of QIE Nexus</p>
+
+        <!-- Stats -->
+        <div class="grid grid-4" style="margin-bottom: var(--spacing-2xl);">
+            <div class="card text-center">
+                <div style="font-size: var(--text-3xl); font-weight: 700; color: var(--qie-primary);">12,500</div>
+                <div style="color: var(--text-secondary); margin-top: var(--spacing-sm);">Your Voting Power</div>
+            </div>
+            <div class="card text-center">
+                <div style="font-size: var(--text-3xl); font-weight: 700; color: var(--success);">5</div>
+                <div style="color: var(--text-secondary); margin-top: var(--spacing-sm);">Active Proposals</div>
+            </div>
+            <div class="card text-center">
+                <div style="font-size: var(--text-3xl); font-weight: 700; color: var(--info);">15</div>
+                <div style="color: var(--text-secondary); margin-top: var(--spacing-sm);">Total Proposals</div>
+            </div>
+            <div class="card text-center">
+                <div style="font-size: var(--text-3xl); font-weight: 700; color: var(--warning);">250K QIE</div>
+                <div style="color: var(--text-secondary); margin-top: var(--spacing-sm);">Treasury Balance</div>
+            </div>
+        </div>
+
+        <!-- Active Proposals -->
+        <h2>Active Proposals</h2>
+        <div style="margin-bottom: var(--spacing-2xl);">
+            <!-- Proposal 1 -->
+            <div class="proposal-card">
+                <div class="proposal-header">
+                    <div style="flex: 1;">
+                        <h3>Upgrade AI Model to v2.0</h3>
+                        <p style="color: var(--text-secondary); font-size: var(--text-sm);">
+                            Proposed by 0x1234...5678 • 3 days remaining
+                        </p>
+                    </div>
+                    <span class="proposal-status status-active">Active</span>
+                </div>
+
+                <p>Deploy new LSTM model with 85% accuracy (up from 78%). Model has been tested on 10,000 historical
+                    predictions with improved performance across all asset classes.</p>
+
+                <div class="vote-bar">
+                    <div class="vote-fill" style="width: 72%"></div>
+                </div>
+
+                <div
+                    style="display: flex; justify-content: space-between; font-size: var(--text-sm); color: var(--text-secondary); margin-bottom: var(--spacing-md);">
+                    <span style="color: var(--success);">FOR: 72% (18,500 votes)</span>
+                    <span style="color: var(--danger);">AGAINST: 28% (7,200 votes)</span>
+                </div>
+
+                <div class="vote-buttons">
+                    <button class="btn btn-success" onclick="vote(1, true)">Vote FOR</button>
+                    <button class="btn btn-danger" onclick="vote(1, false)">Vote AGAINST</button>
+                </div>
+            </div>
+
+            <!-- Proposal 2 -->
+            <div class="proposal-card">
+                <div class="proposal-header">
+                    <div style="flex: 1;">
+                        <h3>Add Stock Market Predictions</h3>
+                        <p style="color: var(--text-secondary); font-size: var(--text-sm);">
+                            Proposed by 0x8765...4321 • 5 days remaining
+                        </p>
+                    </div>
+                    <span class="proposal-status status-active">Active</span>
+                </div>
+
+                <p>Expand QIE Nexus to include stock market predictions (S&P 500, NASDAQ, individual stocks).
+                    Requires integration with 3 new oracle feeds.</p>
+
+                <div class="vote-bar">
+                    <div class="vote-fill" style="width: 58%"></div>
+                </div>
+
+                <div
+                    style="display: flex; justify-content: space-between; font-size: var(--text-sm); color: var(--text-secondary); margin-bottom: var(--spacing-md);">
+                    <span style="color: var(--success);">FOR: 58% (14,200 votes)</span>
+                    <span style="color: var(--danger);">AGAINST: 42% (10,300 votes)</span>
+                </div>
+
+                <div class="vote-buttons">
+                    <button class="btn btn-success" onclick="vote(2, true)">Vote FOR</button>
+                    <button class="btn btn-danger" onclick="vote(2, false)">Vote AGAINST</button>
+                </div>
+            </div>
+
+            <!-- Proposal 3 -->
+            <div class="proposal-card">
+                <div class="proposal-header">
+                    <div style="flex: 1;">
+                        <h3>Reduce Platform Fee to 1.5%</h3>
+                        <p style="color: var(--text-secondary); font-size: var(--text-sm);">
+                            Proposed by 0x2468...1357 • 2 days remaining
+                        </p>
+                    </div>
+                    <span class="proposal-status status-active">Active</span>
+                </div>
+
+                <p>Lower the platform fee from 2% to 1.5% to attract more users and increase trading volume. Treasury
+                    has sufficient reserves to sustain operations.</p>
+
+                <div class="vote-bar">
+                    <div class="vote-fill" style="width: 45%"></div>
+                </div>
+
+                <div
+                    style="display: flex; justify-content: space-between; font-size: var(--text-sm); color: var(--text-secondary); margin-bottom: var(--spacing-md);">
+                    <span style="color: var(--success);">FOR: 45% (11,000 votes)</span>
+                    <span style="color: var(--danger);">AGAINST: 55% (13,500 votes)</span>
+                </div>
+
+                <div class="vote-buttons">
+                    <button class="btn btn-success" onclick="vote(3, true)">Vote FOR</button>
+                    <button class="btn btn-danger" onclick="vote(3, false)">Vote AGAINST</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Model Performance Leaderboard -->
+        <h2>AI Model Performance</h2>
+        <div class="grid grid-3" style="margin-bottom: var(--spacing-2xl);">
+            <div class="model-card">
+                <div class="model-version">v1.0</div>
+                <div style="color: var(--text-secondary); margin-bottom: var(--spacing-md);">Current Model</div>
+                <div class="metric">
+                    <span style="color: var(--text-secondary);">Accuracy</span>
+                    <span style="color: var(--success); font-weight: 600;">78%</span>
+                </div>
+                <div class="metric">
+                    <span style="color: var(--text-secondary);">Predictions</span>
+                    <span>1,247</span>
+                </div>
+                <div class="metric">
+                    <span style="color: var(--text-secondary);">Avg Gas</span>
+                    <span>87k</span>
+                </div>
+            </div>
+
+            <div class="model-card" style="border: 2px solid var(--qie-primary);">
+                <div class="model-version">v2.0</div>
+                <div style="color: var(--text-secondary); margin-bottom: var(--spacing-md);">Proposed</div>
+                <div class="metric">
+                    <span style="color: var(--text-secondary);">Accuracy</span>
+                    <span style="color: var(--success); font-weight: 600;">85%</span>
+                </div>
+                <div class="metric">
+                    <span style="color: var(--text-secondary);">Test Predictions</span>
+                    <span>10,000</span>
+                </div>
+                <div class="metric">
+                    <span style="color: var(--text-secondary);">Avg Gas</span>
+                    <span>92k</span>
+                </div>
+            </div>
+
+            <div class="model-card">
+                <div class="model-version">v0.9</div>
+                <div style="color: var(--text-secondary); margin-bottom: var(--spacing-md);">Legacy</div>
+                <div class="metric">
+                    <span style="color: var(--text-secondary);">Accuracy</span>
+                    <span style="color: var(--warning); font-weight: 600;">72%</span>
+                </div>
+                <div class="metric">
+                    <span style="color: var(--text-secondary);">Predictions</span>
+                    <span>856</span>
+                </div>
+                <div class="metric">
+                    <span style="color: var(--text-secondary);">Avg Gas</span>
+                    <span>95k</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Treasury -->
+        <h2>Treasury</h2>
+        <div class="card">
+            <div class="grid grid-2">
+                <div>
+                    <h3>Balance: 250,000 QIE</h3>
+                    <p style="color: var(--text-secondary);">Current treasury holdings from platform fees</p>
+
+                    <div style="margin-top: var(--spacing-lg);">
+                        <h4>Recent Transactions</h4>
+                        <div class="metric">
+                            <span>Platform Fees Collected</span>
+                            <span style="color: var(--success);">+2,500 QIE</span>
+                        </div>
+                        <div class="metric">
+                            <span>Grant Payout (Dev Team)</span>
+                            <span style="color: var(--danger);">-10,000 QIE</span>
+                        </div>
+                        <div class="metric">
+                            <span>Liquidity Provision</span>
+                            <span style="color: var(--danger);">-5,000 QIE</span>
+                        </div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: center;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 5rem;">💰</div>
+                        <button class="btn btn-outline mt-2">View on Explorer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="js/web3.js"></script>
+    <script>
+        function vote(proposalId, support) {
+            const action = support ? 'FOR' : 'AGAINST';
+            alert(`Voting ${action} on proposal ${proposalId}. Please confirm in your wallet.`);
+        }
+    </script>
+</body>
+
+</html>

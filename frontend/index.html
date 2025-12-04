@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="QIE Nexus - AI-Powered Prediction Markets on QIE Blockchain. Trade predictions with on-chain AI inference and 3-second finality.">
+    <meta name="keywords" content="prediction market, AI, blockchain, QIE, decentralized, neural network">
+    <title>QIE Nexus | AI-Powered Prediction Markets on QIE</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/main.css">
+
+    <style>
+        /* Hero Section - QIE.digital Pink/Magenta Style */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animated grid background */
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                linear-gradient(rgba(233, 30, 140, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(233, 30, 140, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% {
+                transform: translate(0, 0);
+            }
+
+            100% {
+                transform: translate(50px, 50px);
+            }
+        }
+
+        /* Multiple glowing orbs */
+        .hero::after {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(233, 30, 140, 0.2) 0%, transparent 70%);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        .glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .glow-orb-1 {
+            width: 300px;
+            height: 300px;
+            background: rgba(233, 30, 140, 0.15);
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .glow-orb-2 {
+            width: 400px;
+            height: 400px;
+            background: rgba(139, 92, 246, 0.1);
+            bottom: 10%;
+            right: 10%;
+            animation-delay: 2s;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            50% {
+                transform: translate(30px, -30px) scale(1.1);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.3;
+            }
+
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 0.6;
+            }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            max-width: 1000px;
+            padding: var(--spacing-3xl);
+            border: 2px solid rgba(233, 30, 140, 0.3);
+            border-radius: var(--radius-2xl);
+            background: rgba(26, 26, 26, 0.7);
+            backdrop-filter: blur(20px);
+            box-shadow:
+                0 0 60px rgba(233, 30, 140, 0.3),
+                inset 0 0 60px rgba(233, 30, 140, 0.05);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            background: rgba(233, 30, 140, 0.1);
+            border: 1px solid var(--primary);
+            border-radius: var(--radius-full);
+            color: var(--primary);
+            font-size: var(--text-sm);
+            font-weight: 600;
+            margin-bottom: var(--spacing-lg);
+            animation: slideDown 1s ease-out 0.3s both;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: var(--spacing-lg);
+            color: var(--text-primary);
+            text-shadow: 0 0 40px rgba(233, 30, 140, 0.6);
+            line-height: 1.1;
+            animation: slideDown 1s ease-out 0.5s both;
+        }
+
+        .hero h1 .highlight {
+            background: var(--gradient-text);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            display: inline-block;
+        }
+
+        .hero .subtitle {
+            font-size: var(--text-2xl);
+            margin-bottom: var(--spacing-md);
+            color: var(--text-secondary);
+            font-weight: 500;
+            animation: slideDown 1s ease-out 0.7s both;
+        }
+
+        .hero .features-list {
+            display: flex;
+            gap: var(--spacing-lg);
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: var(--spacing-2xl);
+            animation: slideDown 1s ease-out 0.9s both;
+        }
+
+        .hero .features-list span {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: var(--text-base);
+            color: var(--text-secondary);
+        }
+
+        .hero .features-list span::before {
+            content: '✓';
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: rgba(233, 30, 140, 0.2);
+            border: 1px solid var(--primary);
+            border-radius: 50%;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: slideDown 1s ease-out 1.1s both;
+        }
+
+        .btn-hero {
+            padding: 16px 40px;
+            font-size: var(--text-lg);
+            font-weight: 700;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-hero::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-hero:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        /* Stats Section */
+        .stats {
+            padding: var(--spacing-3xl) 0;
+            background: var(--bg-secondary);
+            border-top: 1px solid rgba(233, 30, 140, 0.2);
+            border-bottom: 1px solid rgba(233, 30, 140, 0.2);
+            position: relative;
+        }
+
+        .stats::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: var(--spacing-xl);
+            position: relative;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: var(--radius-full);
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .stat-number {
+            font-size: var(--text-5xl);
+            font-weight: 900;
+            background: var(--gradient-text);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: none;
+            margin-top: var(--spacing-md);
+        }
+
+        .stat-label {
+            font-size: var(--text-lg);
+            color: var(--text-secondary);
+            margin-top: var(--spacing-sm);
+            font-weight: 500;
+        }
+
+        /* Section Headers */
+        .section-header {
+            text-align: center;
+            margin-bottom: var(--spacing-3xl);
+        }
+
+        .section-header h2 {
+            font-size: var(--text-4xl);
+            font-weight: 800;
+            margin-bottom: var(--spacing-md);
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: var(--gradient-primary);
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .section-header p {
+            font-size: var(--text-xl);
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: var(--spacing-lg) auto 0;
+        }
+
+        /* Feature Cards */
+        .feature-card {
+            text-align: center;
+            padding: var(--spacing-2xl);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius-xl);
+            padding: 2px;
+            background: var(--gradient-primary);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-icon {
+            font-size: 4rem;
+            margin-bottom: var(--spacing-lg);
+            filter: drop-shadow(0 0 20px rgba(233, 30, 140, 0.4));
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1) rotateY(10deg);
+        }
+
+        .feature-card h3 {
+            font-size: var(--text-xl);
+            margin-bottom: var(--spacing-md);
+            color: var(--primary);
+        }
+
+        /* Timeline */
+        .timeline-step {
+            position: relative;
+            padding-left: var(--spacing-3xl);
+        }
+
+        .timeline-step::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, var(--primary), transparent);
+        }
+
+        .timeline-step::after {
+            content: attr(data-step);
+            position: absolute;
+            left: -12px;
+            top: 0;
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            border: 3px solid var(--bg-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: var(--text-sm);
+            box-shadow: 0 0 20px var(--primary);
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, rgba(233, 30, 140, 0.1), rgba(139, 92, 246, 0.1));
+            border: 2px solid rgba(233, 30, 140, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(233, 30, 140, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--bg-secondary);
+            padding: var(--spacing-3xl) 0;
+            text-align: center;
+            border-top: 1px solid rgba(233, 30, 140, 0.2);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: var(--spacing-xl);
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: var(--spacing-xl) 0;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .footer-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .footer-links a:hover::after {
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero .subtitle {
+                font-size: var(--text-lg);
+            }
+
+            .hero-content {
+                padding: var(--spacing-xl);
+            }
+
+            .hero .features-list {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar"
+        style="background: var(--bg-secondary); padding: var(--spacing-md) 0; border-bottom: 1px solid rgba(255,255,255,0.1); position: absolute; top: 0; left: 0; right: 0; z-index: 100;">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: var(--text-xl); font-weight: 700;">🔮 QIE Nexus</div>
+            <div style="display: flex; gap: var(--spacing-lg); align-items: center;">
+                <a href="index.html" style="color: var(--primary);">Home</a>
+                <a href="dashboard.html">Markets</a>
+                <a href="portfolio.html">Portfolio</a>
+                <a href="governance.html">Governance</a>
+                <a href="dashboard.html" class="btn btn-primary btn-sm">Launch App</a>
+            </div>
+        </div>
+    </nav>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="glow-orb glow-orb-1"></div>
+        <div class="glow-orb glow-orb-2"></div>
+
+        <div class="hero-content">
+            <div class="hero-badge">🏆 QIE Blockchain Hackathon 2025</div>
+
+            <h1>
+                🔮 <span class="highlight">QIE Nexus</span>
+            </h1>
+
+            <p class="subtitle">
+                The World's First On-Chain AI Prediction Market
+            </p>
+
+            <div class="features-list">
+                <span>QIE Blockchain</span>
+                <span>3-Second Finality</span>
+                <span>7 Live Oracles</span>
+                <span>78% AI Accuracy</span>
+            </div>
+
+            <div class="hero-buttons">
+                <a href="dashboard.html" class="btn btn-primary btn-hero">Launch App →</a>
+                <a href="#features" class="btn btn-outline btn-hero">Learn More</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="container">
+            <div class="grid grid-4">
+                <div class="stat-card">
+                    <div class="stat-number" id="tvl-stat">$0</div>
+                    <div class="stat-label">Total Value Locked</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="markets-stat">0</div>
+                    <div class="stat-label">Active Markets</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="predictions-stat">0</div>
+                    <div class="stat-label">Total Predictions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="winrate-stat">0%</div>
+                    <div class="stat-label">AI Accuracy</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="container" style="padding: var(--spacing-3xl) 0;">
+        <div class="section-header">
+            <h2>How It Works</h2>
+            <p>Start predicting in three simple steps</p>
+        </div>
+
+        <div class="grid grid-3">
+            <div class="card timeline-step" data-step="1">
+                <div style="font-size: 3.5rem; margin-bottom: var(--spacing-md);">👛</div>
+                <h3>Connect Wallet</h3>
+                <p>Connect your MetaMask wallet to the QIE Blockchain network in seconds</p>
+            </div>
+            <div class="card timeline-step" data-step="2">
+                <div style="font-size: 3.5rem; margin-bottom: var(--spacing-md);">🎯</div>
+                <h3>Stake on Predictions</h3>
+                <p>Choose a market and stake QIE tokens on YES or NO outcomes with AI guidance</p>
+            </div>
+            <div class="card timeline-step" data-step="3">
+                <div style="font-size: 3.5rem; margin-bottom: var(--spacing-md);">💰</div>
+                <h3>Earn Rewards</h3>
+                <p>Win proportional rewards if your prediction is correct, settled by oracles</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" style="padding: var(--spacing-3xl) 0; background: var(--bg-secondary);">
+        <div class="container">
+            <div class="section-header">
+                <h2>Revolutionary Features</h2>
+                <p>Powered by cutting-edge blockchain and AI technology</p>
+            </div>
+
+            <div class="grid grid-3">
+                <div class="card feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3>On-Chain AI Inference</h3>
+                    <p>Quantized neural networks run directly on-chain with <500ms inference time</p>
+                </div>
+                <div class="card feature-card">
+                    <div class="feature-icon">🔗</div>
+                    <h3>7 Oracle Integration</h3>
+                    <p>Real-time data from forex, commodities, and crypto oracles with consensus mechanism</p>
+                </div>
+                <div class="card feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>3-Second Finality</h3>
+                    <p>Lightning-fast transactions on QIE Blockchain with near-zero fees</p>
+                </div>
+                <div class="card feature-card">
+                    <div class="feature-icon">💸</div>
+                    <h3>Near-Zero Fees</h3>
+                    <p>Trade predictions without worrying about high gas costs</p>
+                </div>
+                <div class="card feature-card">
+                    <div class="feature-icon">🧠</div>
+                    <h3>Self-Learning Models</h3>
+                    <p>AI models improve over time through federated learning</p>
+                </div>
+                <div class="card feature-card">
+                    <div class="feature-icon">🏛️</div>
+                    <h3>DAO Governance</h3>
+                    <p>Community-controlled model upgrades and platform decisions</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="container" style="padding: var(--spacing-3xl) 0;">
+        <div class="card cta-section text-center" style="padding: var(--spacing-3xl); position: relative; z-index: 1;">
+            <h2 style="font-size: var(--text-4xl); margin-bottom: var(--spacing-md);">Ready to Start Predicting?</h2>
+            <p style="font-size: var(--text-xl); margin-bottom: var(--spacing-2xl); color: var(--text-secondary);">
+                Join thousands of users making profitable predictions with AI assistance
+            </p>
+            <a href="dashboard.html" class="btn btn-primary btn-hero">Launch App Now →</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <h3 style="font-size: var(--text-2xl); margin-bottom: var(--spacing-md);">🔮 QIE Nexus</h3>
+            <p style="color: var(--text-secondary);">AI-Powered Prediction Markets on QIE Blockchain</p>
+
+            <div class="footer-links">
+                <a href="https://github.com" target="_blank">GitHub</a>
+                <a href="https://twitter.com" target="_blank">Twitter</a>
+                <a href="https://discord.com" target="_blank">Discord</a>
+                <a href="https://t.me" target="_blank">Telegram</a>
+                <a href="dashboard.html">Dashboard</a>
+                <a href="governance.html">Governance</a>
+            </div>
+
+            <p style="margin-top: var(--spacing-xl); color: var(--text-muted); font-size: var(--text-sm);">
+                © 2025 QIE Nexus. Built for QIE Blockchain Hackathon.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Animate stats on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                animateValue('tvl-stat', 0, 125000, 2000, '$');
+                animateValue('markets-stat', 0, 15, 1500);
+                animateValue('predictions-stat', 0, 1247, 2000);
+                animateValue('winrate-stat', 0, 78, 1500, '', '%');
+            }, 500);
+        });
+
+        function animateValue(id, start, end, duration, prefix = '', suffix = '') {
+            const element = document.getElementById(id);
+            const range = end - start;
+            const startTime = performance.now();
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+                const current = start + (range * easeOutQuart);
+                const value = Math.floor(current);
+                element.textContent = prefix + value.toLocaleString() + suffix;
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+
+            requestAnimationFrame(update);
+        }
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Scroll reveal
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'fadeInUp 0.6s ease-out forwards';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.card, .stat-card').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+
+</html>

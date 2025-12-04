@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio | QIE Nexus</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        .profile-section {
+            display: none;
+        }
+
+        .profile-section.active {
+            display: block;
+        }
+
+        .wallet-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .info-card {
+            background: var(--bg-secondary);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(233, 30, 140, 0.2);
+        }
+
+        .info-label {
+            color: var(--text-secondary);
+            font-size: var(--text-sm);
+            margin-bottom: var(--spacing-xs);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .info-value {
+            color: var(--text-primary);
+            font-size: var(--text-lg);
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-md);
+            background: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-sm);
+            border-left: 3px solid var(--qie-primary);
+        }
+
+        .position-card {
+            background: var(--bg-secondary);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--spacing-md);
+            border: 1px solid rgba(233, 30, 140, 0.2);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: var(--text-sm);
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .badge-info {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--info);
+        }
+
+        .copy-btn {
+            cursor: pointer;
+            padding: 4px 8px;
+            background: rgba(233, 30, 140, 0.2);
+            border: none;
+            border-radius: 6px;
+            color: var(--qie-primary);
+            font-size: var(--text-sm);
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: rgba(233, 30, 140, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar"
+        style="background: var(--bg-secondary); padding: var(--spacing-md) 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: var(--text-xl); font-weight: 700;">🔮 QIE Nexus</div>
+            <div style="display: flex; gap: var(--spacing-lg); align-items: center;">
+                <a href="index.html">Home</a>
+                <a href="dashboard.html">Markets</a>
+                <a href="portfolio.html" style="color: var(--qie-primary);">Portfolio</a>
+                <a href="governance.html">Governance</a>
+                <button class="btn btn-primary btn-sm" id="wallet-btn" onclick="connectWallet()">Connect Wallet</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container" style="padding: var(--spacing-2xl) 0;">
+        <!-- Not Connected State -->
+        <div id="not-connected-section" class="profile-section active">
+            <h1>QIE Nexus</h1>
+            <p style="font-size: var(--text-lg); margin-bottom: var(--spacing-xl);">Your Decentralized Identity & Asset
+                Vault</p>
+
+            <div class="grid grid-4" style="margin-bottom: var(--spacing-xl);">
+                <div class="card text-center">
+                    <div style="font-size: var(--text-3xl); font-weight: 700; color: var(--qie-primary);">0</div>
+                    <div style="color: var(--text-secondary); margin-top: var(--spacing-sm);">Active Positions</div>
+                </div>
+                <div class="card text-center">
+                    <div style="font-size: var(--text-3xl); font-weight: 700; color: var(--success);">0 QIE</div>
+                    <div style="color: var(--text-secondary); margin-top: var(--spacing-sm);">Total Staked</div>
+                </div>
+                <div class="card text-center">
+                    <div style="font-size: var(--text-3xl); font-weight: 700; color: var(--warning);">0 QIE</div>
+                    <div style="color: var(--text-secondary); margin-top: var(--spacing-sm);">Total Won</div>
+                </div>
+                <div class="card text-center">
+                    <div style="font-size: var(--text-3xl); font-weight: 700; color: var(--info);">0%</div>
+                    <div style="color: var(--text-secondary); margin-top: var(--spacing-sm);">Win Rate</div>
+                </div>
+            </div>
+
+            <div class="card text-center" style="padding: var(--spacing-3xl);">
+                <div style="font-size: 4rem; margin-bottom: var(--spacing-lg);">🔌</div>
+                <h3>Connect Your Wallet</h3>
+                <p style="margin: var(--spacing-md) 0;">Connect your wallet to view your complete portfolio, transaction
+                    history, and profile information.</p>
+                <button class="btn btn-primary" style="margin-top: var(--spacing-lg);" onclick="connectWallet()">Connect
+                    Wallet</button>
+            </div>
+        </div>
+
+        <!-- Connected State -->
+        <div id="connected-section" class="profile-section">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-xl);">
+                <div>
+                    <h1>QIE Nexus</h1>
+                    <p style="font-size: var(--text-lg); color: var(--text-secondary);">Your Decentralized Identity &
+                        Asset Vault</p>
+                </div>
+                <button class="btn btn-secondary" onclick="disconnectWallet()">Disconnect</button>
+            </div>
+
+            <!-- Wallet Information -->
+            <div class="card" style="margin-bottom: var(--spacing-xl);">
+                <h2 style="margin-bottom: var(--spacing-lg);">💼 Wallet Information</h2>
+                <div class="wallet-info-grid">
+                    <div class="info-card">
+                        <div class="info-label">Wallet Address</div>
+                        <div class="info-value" id="profile-address"
+                            style="display: flex; align-items: center; gap: var(--spacing-sm);">
+                            <span id="address-text">Not connected</span>
+                            <button class="copy-btn" onclick="copyAddress()" title="Copy address">📋</button>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">QIE Balance</div>
+                        <div class="info-value" id="profile-balance">0 QIE</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Network</div>
+                        <div class="info-value" id="profile-network">Not connected</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Connection Status</div>
+                        <div class="info-value" id="profile-status">
+                            <span class="badge badge-success" id="status-badge">✓ Connected</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Portfolio Statistics -->
+            <div class="grid grid-4" style="margin-bottom: var(--spacing-xl);">
+                <div class="card text-center">
+                    <div style="font-size: var(--text-3xl); font-weight: 700; color: var(--qie-primary);"
+                        id="stat-positions">0</div>
+                    <div style="color: var(--text-secondary); margin-top: var(--spacing-sm);">Active Positions</div>
+                </div>
+                <div class="card text-center">
+                    <div style="font-size: var(--text-3xl); font-weight: 700; color: var(--success);" id="stat-staked">0
+                        QIE</div>
+                    <div style="color: var(--text-secondary); margin-top: var(--spacing-sm);">Total Staked</div>
+                </div>
+                <div class="card text-center">
+                    <div style="font-size: var(--text-3xl); font-weight: 700; color: var(--warning);" id="stat-won">0
+                        QIE</div>
+                    <div style="color: var(--text-secondary); margin-top: var(--spacing-sm);">Total Won</div>
+                </div>
+                <div class="card text-center">
+                    <div style="font-size: var(--text-3xl); font-weight: 700; color: var(--info);" id="stat-winrate">0%
+                    </div>
+                    <div style="color: var(--text-secondary); margin-top: var(--spacing-sm);">Win Rate</div>
+                </div>
+            </div>
+
+            <!-- Active Positions -->
+            <div class="card" style="margin-bottom: var(--spacing-xl);">
+                <h2 style="margin-bottom: var(--spacing-lg);">📊 Active Positions</h2>
+                <div id="positions-container">
+                    <div style="text-align: center; padding: var(--spacing-xl); color: var(--text-secondary);">
+                        <p>No active positions yet. Start predicting to see your positions here!</p>
+                        <a href="dashboard.html" class="btn btn-primary" style="margin-top: var(--spacing-md);">Browse
+                            Markets</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transaction History -->
+            <div class="card" style="margin-bottom: var(--spacing-xl);">
+                <h2 style="margin-bottom: var(--spacing-lg);">📜 Transaction History</h2>
+                <div id="transactions-container">
+                    <div style="text-align: center; padding: var(--spacing-xl); color: var(--text-secondary);">
+                        <p>No transactions yet. Your transaction history will appear here.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Wallet Details -->
+            <div class="card">
+                <h2 style="margin-bottom: var(--spacing-lg);">⚙️ Additional Details</h2>
+                <div class="wallet-info-grid">
+                    <div class="info-card">
+                        <div class="info-label">Connection Type</div>
+                        <div class="info-value" id="connection-type">MetaMask</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Chain ID</div>
+                        <div class="info-value" id="chain-id">-</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Total Transactions</div>
+                        <div class="info-value" id="total-tx">0</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Member Since</div>
+                        <div class="info-value" id="member-since">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="js/web3.js"></script>
+    <script src="js/portfolio.js"></script>
+</body>
+
+</html>

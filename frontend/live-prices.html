@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Oracle Prices | QIE Nexus</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+
+    <style>
+        .price-card {
+            background: var(--bg-secondary);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .price-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .price-label {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .price-value {
+            font-size: var(--text-3xl);
+            font-weight: 700;
+            color: var(--primary);
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+
+        .price-change {
+            font-size: var(--text-sm);
+            margin-top: var(--spacing-sm);
+        }
+
+        .price-change.up {
+            color: var(--success);
+        }
+
+        .price-change.down {
+            color: var(--danger);
+        }
+
+        .update-time {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-top: var(--spacing-lg);
+            font-size: var(--text-sm);
+        }
+
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 style="text-align: center; margin-bottom: var(--spacing-md);">
+            🔴 QIE Nexus Live Prices
+        </h1>
+        <p style="text-align: center; color: var(--text-secondary); margin-bottom: var(--spacing-xl);">
+            Real-time data from CoinGecko API • Updates every 10 seconds
+        </p>
+
+        <div class="ticker-container">
+            <div class="grid grid-3" id="prices-grid">
+                <!-- Prices will be loaded here -->
+                <div class="price-card">
+                    <div class="price-label">Loading...</div>
+                    <div class="price-value">--</div>
+                </div>
+            </div>
+
+            <div class="update-time" id="update-time">
+                Last updated: Never
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: var(--spacing-xl);">
+            <a href="dashboard.html" class="btn btn-primary">← Back to Dashboard</a>
+            <a href="index.html" class="btn btn-outline">Home</a>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api/oracles/prices';
+        let previousPrices = {};
+
+        async function fetchPrices() {
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+
+                displayPrices(data);
+                updateTime();
+            } catch (error) {
+                console.error('Error fetching prices:', error);
+                document.getElementById('update-time').textContent = 'Error fetching data';
+            }
+        }
+
+        function displayPrices(data) {
+            const grid = document.getElementById('prices-grid');
+            grid.innerHTML = '';
+
+            // Display crypto prices
+            if (data.crypto) {
+                Object.entries(data.crypto).forEach(([symbol, price]) => {
+                    const card = createPriceCard(symbol.toUpperCase(), price, 'crypto');
+                    grid.appendChild(card);
+                });
+            }
+
+            // Display commodity prices
+            if (data.commodities) {
+                Object.entries(data.commodities).forEach(([symbol, price]) => {
+                    const card = createPriceCard(symbol, price, 'commodity');
+                    grid.appendChild(card);
+                });
+            }
+
+            // Display forex prices
+            if (data.forex) {
+                Object.entries(data.forex).forEach(([symbol, price]) => {
+                    const card = createPriceCard(symbol, price, 'forex');
+                    grid.appendChild(card);
+                });
+            }
+        }
+
+        function createPriceCard(symbol, price, type) {
+            const card = document.createElement('div');
+            card.className = 'price-card';
+
+            // Calculate price change
+            const previousPrice = previousPrices[symbol];
+            let changeHtml = '';
+            let changeClass = '';
+
+            if (previousPrice !== undefined && previousPrice !== price) {
+                const change = ((price - previousPrice) / previousPrice * 100).toFixed(2);
+                changeClass = price > previousPrice ? 'up' : 'down';
+                const arrow = price > previousPrice ? '↑' : '↓';
+                changeHtml = `<div class="price-change ${changeClass}">${arrow} ${Math.abs(change)}%</div>`;
+
+                // Add pulse animation on change
+                card.classList.add('pulse');
+                setTimeout(() => card.classList.remove('pulse'), 2000);
+            }
+
+            // Store current price for next comparison
+            previousPrices[symbol] = price;
+
+            // Format price
+            let formattedPrice;
+            if (type === 'crypto') {
+                formattedPrice = '$' + price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            } else if (type === 'commodity') {
+                formattedPrice = '$' + price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            } else {
+                formattedPrice = price.toFixed(4);
+            }
+
+            // Get emoji for type
+            const emoji = type === 'crypto' ? '₿' : type === 'commodity' ? '🏆' : '💱';
+
+            card.innerHTML = `
+                <div class="price-label">${emoji} ${symbol}</div>
+                <div class="price-value">${formattedPrice}</div>
+                ${changeHtml}
+            `;
+
+            return card;
+        }
+
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('update-time').textContent = `Last updated: ${timeString} (Live Data)`;
+        }
+
+        // Initial fetch
+        fetchPrices();
+
+        // Update every 10 seconds
+        setInterval(fetchPrices, 10000);
+
+        // Visual indicator that it's live
+        setInterval(() => {
+            const updateEl = document.getElementById('update-time');
+            updateEl.style.color = 'var(--primary)';
+            setTimeout(() => {
+                updateEl.style.color = 'var(--text-secondary)';
+            }, 500);
+        }, 10000);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet Status | QIE Nexus</title>
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        body {
+            padding: 50px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .status-card {
+            padding: 30px;
+            margin: 20px 0;
+            border-radius: 15px;
+            border: 2px solid;
+        }
+
+        .connected {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: #10B981;
+        }
+
+        .disconnected {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: #EF4444;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .label {
+            color: #9CA3AF;
+            font-weight: 600;
+        }
+
+        .value {
+            color: #E91E8C;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .big-button {
+            padding: 20px 40px;
+            font-size: 20px;
+            margin: 20px 0;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🔮 Wallet Connection Status</h1>
+    <p>Simple page to verify your wallet connection</p>
+
+    <button class="btn btn-primary big-button" id="connect-btn" onclick="connect()">
+        Connect Wallet
+    </button>
+
+    <div id="status-display"></div>
+
+    <div style="margin-top: 30px;">
+        <a href="dashboard.html" class="btn btn-outline">← Back to Dashboard</a>
+        <a href="portfolio.html" class="btn btn-outline">Go to Portfolio →</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script>
+        let web3;
+        let userAccount;
+
+        async function connect() {
+            const btn = document.getElementById('connect-btn');
+            btn.textContent = '⏳ Connecting...';
+            btn.disabled = true;
+
+            try {
+                if (typeof window.ethereum === 'undefined') {
+                    showStatus(false, 'No wallet detected', null, null, null);
+                    btn.textContent = 'No Wallet Found';
+                    return;
+                }
+
+                // Initialize Web3
+                web3 = new Web3(window.ethereum);
+
+                // Request accounts
+                const accounts = await window.ethereum.request({
+                    method: 'eth_requestAccounts'
+                });
+
+                if (!accounts || accounts.length === 0) {
+                    showStatus(false, 'No accounts found', null, null, null);
+                    btn.textContent = 'Connect Wallet';
+                    btn.disabled = false;
+                    return;
+                }
+
+                userAccount = accounts[0];
+
+                // Get chain ID
+                const chainId = await web3.eth.getChainId();
+
+                // Get network name
+                const networkNames = {
+                    1: 'Ethereum Mainnet',
+                    1983: 'QIE Testnet',
+                    1234: 'QIE Mainnet'
+                };
+                const networkName = networkNames[chainId] || `Chain ID: ${chainId}`;
+
+                // Try to get balance (but don't fail if it doesn't work)
+                let balance = 'Unable to fetch';
+                try {
+                    const balanceWei = await web3.eth.getBalance(userAccount);
+                    balance = parseFloat(web3.utils.fromWei(balanceWei, 'ether')).toFixed(4) + ' QIE';
+                } catch (error) {
+                    console.log('Balance fetch failed (RPC issue):', error.message);
+                    balance = 'RPC Error - Balance unavailable';
+                }
+
+                // Get wallet type
+                const walletType = window.ethereum.isQIEWallet ? 'QIE Wallet' :
+                    window.ethereum.isMetaMask ? 'MetaMask' : 'Unknown';
+
+                // Show success
+                showStatus(true, walletType, userAccount, networkName, balance);
+                btn.textContent = '✅ Connected!';
+                btn.classList.remove('btn-primary');
+                btn.classList.add('btn-success');
+
+                // Store in localStorage
+                localStorage.setItem('walletConnected', 'true');
+                localStorage.setItem('walletAddress', userAccount);
+                localStorage.setItem('walletType', window.ethereum.isQIEWallet ? 'qie' : 'metamask');
+
+            } catch (error) {
+                console.error('Connection error:', error);
+                showStatus(false, 'Connection failed: ' + error.message, null, null, null);
+                btn.textContent = 'Try Again';
+                btn.disabled = false;
+            }
+        }
+
+        function showStatus(connected, wallet, address, network, balance) {
+            const display = document.getElementById('status-display');
+
+            if (!connected) {
+                display.innerHTML = `
+                    <div class="status-card disconnected">
+                        <h2>❌ Not Connected</h2>
+                        <p>${wallet}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            display.innerHTML = `
+                <div class="status-card connected">
+                    <h2>✅ Wallet Connected!</h2>
+                    
+                    <div class="info-row">
+                        <span class="label">Wallet Type:</span>
+                        <span class="value">${wallet}</span>
+                    </div>
+                    
+                    <div class="info-row">
+                        <span class="label">Address:</span>
+                        <span class="value" style="font-size: 14px; font-family: monospace;">${address}</span>
+                    </div>
+                    
+                    <div class="info-row">
+                        <span class="label">Network:</span>
+                        <span class="value">${network}</span>
+                    </div>
+                    
+                    <div class="info-row">
+                        <span class="label">Balance:</span>
+                        <span class="value">${balance}</span>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 20px; padding: 20px; background: rgba(233, 30, 140, 0.1);">
+                    <h3>✅ Success!</h3>
+                    <p>Your wallet is connected. You can now:</p>
+                    <ul>
+                        <li>Navigate to the Dashboard to view markets</li>
+                        <li>Go to Portfolio to see your positions</li>
+                        <li>Start staking on predictions</li>
+                    </ul>
+                    ${balance.includes('RPC Error') ? '<p style="color: #F59E0B; margin-top: 15px;">⚠️ Note: Balance couldn\'t be fetched due to RPC issues, but your wallet is connected and functional!</p>' : ''}
+                </div>
+            `;
+        }
+
+        // Auto-check on load
+        window.addEventListener('load', () => {
+            const wasConnected = localStorage.getItem('walletConnected');
+            if (wasConnected === 'true') {
+                setTimeout(connect, 500);
+            }
+        });
+    </script>
+</body>
+
+</html>

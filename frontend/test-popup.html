@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet Popup Test</title>
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        body {
+            padding: 50px;
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .test-btn {
+            padding: 30px 60px;
+            font-size: 24px;
+            margin: 20px;
+        }
+
+        .log {
+            text-align: left;
+            background: #000;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            margin: 5px 0;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        .log-success {
+            color: #10B981;
+        }
+
+        .log-error {
+            color: #EF4444;
+        }
+
+        .log-info {
+            color: #3B82F6;
+        }
+
+        .log-warning {
+            color: #F59E0B;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🔮 Wallet Popup Test</h1>
+    <p>This will test if your wallet popup opens correctly</p>
+
+    <button class="btn btn-primary test-btn" onclick="testWalletPopup()">
+        🚀 Click to Test Wallet Popup
+    </button>
+
+    <div id="status" style="margin-top: 30px; font-size: 20px; font-weight: bold;"></div>
+
+    <div class="log" id="log"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script>
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            const timestamp = new Date().toLocaleTimeString();
+            entry.textContent = `[${timestamp}] ${message}`;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(message);
+        }
+
+        async function testWalletPopup() {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = '⏳ Testing...';
+
+            log('=== WALLET POPUP TEST STARTED ===', 'info');
+
+            // Step 1: Check if ethereum exists
+            if (typeof window.ethereum === 'undefined') {
+                log('❌ window.ethereum is undefined - No wallet detected!', 'error');
+                statusDiv.textContent = '❌ No Wallet Detected';
+                return;
+            }
+            log('✅ window.ethereum exists', 'success');
+            log(`   isQIEWallet: ${window.ethereum.isQIEWallet}`, 'info');
+            log(`   isMetaMask: ${window.ethereum.isMetaMask}`, 'info');
+
+            // Step 2: Try to request accounts
+            try {
+                log('📞 Calling eth_requestAccounts...', 'info');
+                log('   This should open your wallet popup NOW!', 'warning');
+
+                statusDiv.textContent = '🔓 Wallet popup should be opening...';
+
+                const startTime = Date.now();
+                const accounts = await window.ethereum.request({
+                    method: 'eth_requestAccounts'
+                });
+                const endTime = Date.now();
+                const duration = endTime - startTime;
+
+                log(`✅ Accounts received in ${duration}ms`, 'success');
+                log(`   Account: ${accounts[0]}`, 'success');
+
+                statusDiv.textContent = '✅ SUCCESS! Wallet Connected!';
+
+                // Get additional info
+                const web3 = new Web3(window.ethereum);
+                const chainId = await web3.eth.getChainId();
+                const balance = await web3.eth.getBalance(accounts[0]);
+                const balanceEth = web3.utils.fromWei(balance, 'ether');
+
+                log(`   Chain ID: ${chainId}`, 'info');
+                log(`   Balance: ${balanceEth} QIE`, 'info');
+
+                log('=== TEST COMPLETED SUCCESSFULLY ===', 'success');
+
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+                log(`   Code: ${error.code}`, 'error');
+
+                if (error.code === 4001) {
+                    statusDiv.textContent = '❌ You rejected the connection';
+                    log('   User rejected the request', 'warning');
+                } else if (error.code === -32002) {
+                    statusDiv.textContent = '⚠️ Request already pending';
+                    log('   A request is already pending - check your wallet!', 'warning');
+                } else {
+                    statusDiv.textContent = '❌ Connection Failed';
+                }
+
+                log('=== TEST FAILED ===', 'error');
+            }
+        }
+
+        // Auto-log on page load
+        window.addEventListener('load', () => {
+            log('Page loaded', 'info');
+            log('Ready to test wallet popup', 'success');
+            log('Click the button above to start the test', 'info');
+        });
+    </script>
+</body>
+
+</html>

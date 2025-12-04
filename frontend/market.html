@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Details | QIE Nexus</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+    <nav class="navbar"
+        style="background: var(--bg-secondary); padding: var(--spacing-md) 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: var(--text-xl); font-weight: 700;">🔮 QIE Nexus</div>
+            <div style="display: flex; gap: var(--spacing-lg); align-items: center;">
+                <a href="index.html">Home</a>
+                <a href="dashboard.html" style="color: var(--qie-primary);">Markets</a>
+                <a href="portfolio.html">Portfolio</a>
+                <a href="governance.html">Governance</a>
+                <button class="btn btn-primary btn-sm" id="wallet-btn" onclick="connectWallet()">Connect Wallet</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container" style="padding: var(--spacing-2xl) 0;">
+        <div style="margin-bottom: var(--spacing-md);">
+            <a href="dashboard.html" style="color: var(--text-secondary);">← Back to Markets</a>
+        </div>
+
+        <h1 id="market-question">Loading market...</h1>
+
+        <div class="grid grid-2" style="gap: var(--spacing-xl);">
+            <div>
+                <div class="card">
+                    <h3>AI Prediction</h3>
+                    <div style="text-align: center; padding: var(--spacing-xl);">
+                        <div style="font-size: 4rem; font-weight: 700; color: var(--success);" id="ai-confidence">--
+                        </div>
+                        <div style="color: var(--text-secondary);">Confidence Score</div>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <h3>Market Details</h3>
+                    <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-md);">
+                        <span style="color: var(--text-secondary);">Total Staked:</span>
+                        <span id="total-stake">-- QIE</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: var(--spacing-sm);">
+                        <span style="color: var(--text-secondary);">Time Remaining:</span>
+                        <span id="time-remaining">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="card">
+                    <h3>Place Your Stake</h3>
+                    <div style="margin-top: var(--spacing-lg);">
+                        <label style="display: block; margin-bottom: var(--spacing-sm);">Amount (QIE)</label>
+                        <input type="number" id="stake-amount" class="input" placeholder="100" min="1">
+
+                        <div
+                            style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md); margin-top: var(--spacing-lg);">
+                            <button class="btn btn-success" onclick="handleStake('YES')">
+                                Stake YES
+                            </button>
+                            <button class="btn btn-danger" onclick="handleStake('NO')">
+                                Stake NO
+                            </button>
+                        </div>
+
+                        <p id="stake-message"
+                            style="margin-top: var(--spacing-md); font-size: var(--text-sm); color: var(--text-secondary);">
+                            Connect your wallet to stake on this prediction
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Get market ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const marketId = urlParams.get('id') || 1;
+
+        // Load market data
+        fetch(`http://localhost:5000/api/markets/${marketId}`)
+            .then(res => res.json())
+            .then(market => {
+                document.getElementById('market-question').textContent = market.question || 'Market not found';
+                document.getElementById('ai-confidence').textContent = (market.aiConfidence || 50) + '%';
+                const total = (market.totalStakeYes || 0) + (market.totalStakeNo || 0);
+                document.getElementById('total-stake').textContent = total.toFixed(2) + ' QIE';
+
+                const timeLeft = market.deadline - Math.floor(Date.now() / 1000);
+                const days = Math.floor(timeLeft / 86400);
+                const hours = Math.floor((timeLeft % 86400) / 3600);
+                document.getElementById('time-remaining').textContent = `${days}d ${hours}h`;
+            })
+            .catch(err => {
+                console.error('Error loading market:', err);
+                document.getElementById('market-question').textContent = 'Error loading market';
+            });
+
+        /**
+         * Handle staking action
+         */
+        async function handleStake(choice) {
+            // Check if wallet is connected
+            const walletConnected = localStorage.getItem('walletConnected');
+            const walletAddress = localStorage.getItem('walletAddress');
+            const isDemoMode = localStorage.getItem('demoMode') === 'true';
+
+            if (walletConnected !== 'true' || !walletAddress) {
+                showNotification('Please connect your wallet first!', 'warning');
+                // Optionally trigger wallet connection
+                connectWallet();
+                return;
+            }
+
+            // Get stake amount
+            const amountInput = document.getElementById('stake-amount');
+            const amount = parseFloat(amountInput.value);
+
+            if (!amount || amount <= 0) {
+                showNotification('Please enter a valid stake amount', 'warning');
+                return;
+            }
+
+            // Check balance
+            const balance = isDemoMode
+                ? parseFloat(localStorage.getItem('demoBalance') || '10000')
+                : parseFloat(await getQIEBalance(walletAddress));
+
+            if (amount > balance) {
+                showNotification('Insufficient balance!', 'danger');
+                return;
+            }
+
+            // Handle demo mode staking
+            if (isDemoMode) {
+                // Simulate staking in demo mode
+                const newBalance = balance - amount;
+                localStorage.setItem('demoBalance', newBalance.toString());
+
+                showNotification(`✅ Demo Stake Placed: ${amount} QIE on ${choice}`, 'success');
+
+                // Update UI
+                const stakeMessage = document.getElementById('stake-message');
+                if (stakeMessage) {
+                    stakeMessage.innerHTML = `<span style="color: var(--success);">✓ Staked ${amount} QIE on ${choice}</span>`;
+                }
+
+                // Clear input
+                amountInput.value = '';
+
+                // Redirect to portfolio after 2 seconds
+                setTimeout(() => {
+                    window.location.href = 'portfolio.html';
+                }, 2000);
+
+                return;
+            }
+
+            // Handle real blockchain staking
+            try {
+                showNotification('Processing stake...', 'info');
+
+                const txHash = await stakeOnPrediction(marketId, choice, amount);
+
+                if (txHash) {
+                    showNotification(`Stake successful! TX: ${txHash.substring(0, 10)}...`, 'success');
+
+                    // Update UI
+                    const stakeMessage = document.getElementById('stake-message');
+                    if (stakeMessage) {
+                        stakeMessage.innerHTML = `<span style="color: var(--success);">✓ Staked ${amount} QIE on ${choice}</span>`;
+                    }
+
+                    // Clear input
+                    amountInput.value = '';
+
+                    // Redirect to portfolio after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = 'portfolio.html';
+                    }, 2000);
+                }
+            } catch (error) {
+                console.error('Staking error:', error);
+                showNotification('Staking failed: ' + error.message, 'danger');
+            }
+        }
+
+        // Update UI when wallet connection changes
+        window.addEventListener('load', () => {
+            const walletConnected = localStorage.getItem('walletConnected');
+            const stakeMessage = document.getElementById('stake-message');
+
+            if (walletConnected === 'true' && stakeMessage) {
+                const isDemoMode = localStorage.getItem('demoMode') === 'true';
+                const balance = isDemoMode
+                    ? localStorage.getItem('demoBalance') || '10000'
+                    : '...';
+                stakeMessage.textContent = `Balance: ${balance} QIE - Enter amount and choose YES or NO`;
+            }
+        });
+    </script>
+
+    <!-- Web3 Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="js/web3.js"></script>
+</body>
+
+</html>

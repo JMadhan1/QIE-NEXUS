@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Wallet Connection</title>
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        body {
+            padding: 50px;
+            text-align: center;
+        }
+
+        .test-btn {
+            padding: 20px 40px;
+            font-size: 20px;
+            margin: 20px;
+            cursor: pointer;
+        }
+
+        #status {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🔮 Wallet Connection Test</h1>
+
+    <button class="btn btn-primary test-btn" onclick="testConnection()">
+        Click to Connect Wallet
+    </button>
+
+    <div id="status">
+        <p>Status: <span id="status-text">Not connected</span></p>
+        <p>Address: <span id="address-text">-</span></p>
+        <p>Balance: <span id="balance-text">-</span></p>
+    </div>
+
+    <div style="margin-top: 30px; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto;">
+        <h3>Debug Info:</h3>
+        <pre id="debug-info" style="background: #000; padding: 15px; border-radius: 5px; overflow-x: auto;"></pre>
+    </div>
+
+    <!-- Web3 Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="js/web3.js"></script>
+
+    <script>
+        function updateDebug(message) {
+            const debugEl = document.getElementById('debug-info');
+            const timestamp = new Date().toLocaleTimeString();
+            debugEl.textContent += `[${timestamp}] ${message}\n`;
+            console.log(message);
+        }
+
+        window.addEventListener('load', () => {
+            updateDebug('Page loaded');
+            updateDebug('typeof connectWallet: ' + typeof connectWallet);
+            updateDebug('typeof window.ethereum: ' + typeof window.ethereum);
+            updateDebug('window.ethereum.isQIEWallet: ' + window.ethereum?.isQIEWallet);
+            updateDebug('window.ethereum.isMetaMask: ' + window.ethereum?.isMetaMask);
+        });
+
+        async function testConnection() {
+            updateDebug('Test button clicked!');
+            document.getElementById('status-text').textContent = 'Connecting...';
+
+            try {
+                updateDebug('Calling connectWallet()...');
+                const address = await connectWallet();
+
+                if (address) {
+                    updateDebug('Connected! Address: ' + address);
+                    document.getElementById('status-text').textContent = 'Connected ✅';
+                    document.getElementById('address-text').textContent = address;
+
+                    // Get balance
+                    const isDemoMode = localStorage.getItem('demoMode') === 'true';
+                    const balance = isDemoMode
+                        ? localStorage.getItem('demoBalance')
+                        : '...';
+                    document.getElementById('balance-text').textContent = balance + ' QIE';
+                } else {
+                    updateDebug('Connection failed or cancelled');
+                    document.getElementById('status-text').textContent = 'Failed ❌';
+                }
+            } catch (error) {
+                updateDebug('ERROR: ' + error.message);
+                document.getElementById('status-text').textContent = 'Error ❌';
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+
+</html>
