@@ -24,10 +24,16 @@
         }
 
         .info-card {
-            background: var(--bg-secondary);
+            background: rgba(255, 255, 255, 0.03);
             padding: var(--spacing-lg);
             border-radius: var(--radius-lg);
-            border: 1px solid rgba(233, 30, 140, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.2s;
+        }
+
+        .info-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-2px);
         }
 
         .info-label {
@@ -105,14 +111,15 @@
 </head>
 
 <body>
-    <nav class="navbar"
-        style="background: var(--bg-secondary); padding: var(--spacing-md) 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
-        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="font-size: var(--text-xl); font-weight: 700;">🔮 QIE Nexus</div>
-            <div style="display: flex; gap: var(--spacing-lg); align-items: center;">
+    <nav class="navbar">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <div
+                style="font-size: var(--text-2xl); font-weight: 800; background: var(--gradient-text); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                🔮 QIE Nexus</div>
+            <div class="navbar-menu" style="display: flex; gap: var(--spacing-lg); align-items: center;">
                 <a href="index.html">Home</a>
                 <a href="dashboard.html">Markets</a>
-                <a href="portfolio.html" style="color: var(--qie-primary);">Portfolio</a>
+                <a href="portfolio.html" class="active" style="color: var(--primary);">Portfolio</a>
                 <a href="governance.html">Governance</a>
                 <button class="btn btn-primary btn-sm" id="wallet-btn" onclick="connectWallet()">Connect Wallet</button>
             </div>

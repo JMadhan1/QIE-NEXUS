@@ -11,9 +11,10 @@
     <style>
         .proposal-card {
             background: var(--bg-card);
+            backdrop-filter: blur(12px);
             border-radius: var(--radius-xl);
             padding: var(--spacing-xl);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             margin-bottom: var(--spacing-lg);
             transition: all 0.3s;
         }
@@ -75,9 +76,10 @@
 
         .model-card {
             background: var(--bg-card);
+            backdrop-filter: blur(12px);
             border-radius: var(--radius-xl);
             padding: var(--spacing-lg);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             text-align: center;
         }
 
@@ -102,17 +104,17 @@
 </head>
 
 <body>
-    <nav class="navbar"
-        style="background: var(--bg-secondary); padding: var(--spacing-md) 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
-        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="font-size: var(--text-xl); font-weight: 700;">🔮 QIE Nexus</div>
-            <div style="display: flex; gap: var(--spacing-lg); align-items: center;">
+    <nav class="navbar">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <div
+                style="font-size: var(--text-2xl); font-weight: 800; background: var(--gradient-text); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                🔮 QIE Nexus</div>
+            <div class="navbar-menu" style="display: flex; gap: var(--spacing-lg); align-items: center;">
                 <a href="index.html">Home</a>
                 <a href="dashboard.html">Markets</a>
                 <a href="portfolio.html">Portfolio</a>
-                <a href="governance.html" style="color: var(--qie-primary);">Governance</a>
-                <button class="btn btn-primary btn-sm" id="wallet-btn"
-                    onclick="connectWallet()">Connect Wallet</button>
+                <a href="governance.html" class="active" style="color: var(--primary);">Governance</a>
+                <button class="btn btn-primary btn-sm" id="wallet-btn" onclick="connectWallet()">Connect Wallet</button>
             </div>
         </div>
     </nav>

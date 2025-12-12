@@ -10,11 +10,12 @@
 </head>
 
 <body>
-    <nav class="navbar"
-        style="background: var(--bg-secondary); padding: var(--spacing-md) 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
-        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="font-size: var(--text-xl); font-weight: 700;">🔮 QIE Nexus</div>
-            <div style="display: flex; gap: var(--spacing-lg); align-items: center;">
+    <nav class="navbar">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <div
+                style="font-size: var(--text-2xl); font-weight: 800; background: var(--gradient-text); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                🔮 QIE Nexus</div>
+            <div class="navbar-menu" style="display: flex; gap: var(--spacing-lg); align-items: center;">
                 <a href="index.html">Home</a>
                 <a href="dashboard.html" style="color: var(--qie-primary);">Markets</a>
                 <a href="portfolio.html">Portfolio</a>
@@ -88,7 +89,7 @@
         const marketId = urlParams.get('id') || 1;
 
         // Load market data
-        fetch(`http://localhost:5000/api/markets/${marketId}`)
+        fetch(`/api/markets/${marketId}`)
             .then(res => res.json())
             .then(market => {
                 document.getElementById('market-question').textContent = market.question || 'Market not found';

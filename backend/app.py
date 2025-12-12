@@ -3,7 +3,7 @@ QIE Nexus - Flask Backend Application
 Main entry point for the API server
 """
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -15,7 +15,8 @@ import logging
 load_dotenv()
 
 # Initialize Flask app
-app = Flask(__name__)
+# Serve static files from the frontend folder
+app = Flask(__name__, static_folder='../frontend', static_url_path='')
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'neural-oracle-secret-key-2025')
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
@@ -173,9 +174,9 @@ def health_check():
         }
     }), 200
 
-@app.route('/', methods=['GET'])
-def index():
-    """Root endpoint"""
+@app.route('/api/info', methods=['GET'])
+def api_info():
+    """API Info endpoint"""
     return jsonify({
         'name': 'QIE Nexus API',
         'version': '1.0.0',
@@ -187,6 +188,10 @@ def index():
             'users': '/api/user/:address/portfolio'
         }
     }), 200
+
+@app.route('/')
+def serve_index():
+    return app.send_static_file('index.html')
 
 # ============ Error Handlers ============
 

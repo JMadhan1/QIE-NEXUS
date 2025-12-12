@@ -14,20 +14,13 @@ start "QIE Nexus Backend" cmd /k "cd /d %~dp0backend && venv\Scripts\activate &&
 echo ⏳ Waiting for backend to initialize...
 timeout /t 2 /nobreak > nul
 
-echo 🌐 Starting Frontend HTTP Server...
-start "QIE Nexus Frontend" cmd /k "cd /d %~dp0 && python serve.py"
-
-echo ⏳ Waiting for frontend server...
-timeout /t 2 /nobreak > nul
-
+echo 🌐 App is running as a unified service...
 echo.
 echo ✅ QIE Nexus is now running!
 echo.
-echo 📍 Backend API:  http://127.0.0.1:5000
-echo 📍 Frontend:     http://localhost:8080
-echo 📍 Dashboard:    http://localhost:8080/dashboard.html
+echo 📍 Access the App:   http://127.0.0.1:5001
 echo.
-echo 🦊 MetaMask will work properly on http://localhost:8080
+echo 🦊 MetaMask will work properly on http://127.0.0.1:5001
 echo.
 echo Press any key to exit...
 pause > nul
