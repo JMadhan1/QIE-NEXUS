@@ -3,6 +3,10 @@ QIE Nexus - Flask Backend Application
 Main entry point for the API server
 """
 
+# Monkey patch for eventlet - MUST be first
+import eventlet
+eventlet.monkey_patch()
+
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
