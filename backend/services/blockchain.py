@@ -205,6 +205,53 @@ class BlockchainService:
             logger.error(f"Error settling markets: {e}")
             return []
     
+    def update_ai_confidence(self, market_id: int, confidence: int) -> bool:
+        """
+        Update AI confidence on-chain
+        
+        Args:
+            market_id: Market ID
+            confidence: Confidence score (0-100)
+            
+        Returns:
+            Success boolean
+        """
+        if self.mock_mode:
+            logger.info(f"[MOCK] Updated on-chain confidence for market {market_id} to {confidence}%")
+            return True
+
+        try:
+            contract = self.contracts.get('prediction_core')
+            private_key = os.getenv('OWNER_PRIVATE_KEY')
+            
+            if not contract or not private_key:
+                logger.warning("Cannot update on-chain confidence: Missing contract or private key")
+                return False
+                
+            account = self.w3.eth.account.from_key(private_key)
+            
+            # Build transaction
+            tx = contract.functions.updateAIConfidence(
+                market_id,
+                confidence
+            ).build_transaction({
+                'from': account.address,
+                'nonce': self.w3.eth.get_transaction_count(account.address),
+                'gas': 200000,
+                'gasPrice': self.w3.eth.gas_price
+            })
+            
+            # Sign and send
+            signed_tx = self.w3.eth.account.sign_transaction(tx, private_key)
+            tx_hash = self.w3.eth.send_raw_transaction(signed_tx.rawTransaction)
+            
+            logger.info(f"Updated AI confidence on-chain. Tx: {self.w3.to_hex(tx_hash)}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error updating on-chain confidence: {e}")
+            return False
+
     def listen_to_events(self, event_name: str, callback):
         """
         Listen to smart contract events

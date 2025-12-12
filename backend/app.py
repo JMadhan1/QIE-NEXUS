@@ -108,6 +108,11 @@ def update_ai_predictions():
             active_markets = blockchain_service.get_active_markets()
             for market in active_markets:
                 confidence = ai_service.predict(market['id'])
+                
+                # Update on-chain
+                if blockchain_service:
+                    blockchain_service.update_ai_confidence(market['id'], confidence)
+                
                 socketio.emit('ai_update', {
                     'market_id': market['id'],
                     'confidence': confidence
